@@ -1,0 +1,25 @@
+name: Sync LibreTV Upstream
+on:
+  schedule:
+    - cron: '0 12 * * *'  # 每天 UTC 时间 12:00 (北京时间 20:00) 自动同步
+  workflow_dispatch:       # 允许手动触发
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write    # 授予写入权限
+    
+    steps:
+      - name: Checkout your fork
+        uses: actions/checkout@v4
+        with:
+          ref: master    # LibreTV 使用 master 分支
+
+      - name: Sync LibreSpark/LibreTV
+        uses: upstream-sync/sync-upstream-action@v1
+        with:
+          upstream_repo: LibreSpark/LibreTV   # 源仓库
+          target_branch: master                # LibreTV 主分支是 master
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          merge_method: merge                  # 使用 merge 方式合并
