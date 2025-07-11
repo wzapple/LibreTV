@@ -14,11 +14,19 @@ jobs:
       - name: Checkout your fork
         uses: actions/checkout@v4
         with:
-          ref: main        # 使用 main 分支而不是 master
+          ref: main
+          fetch-depth: 0   # 获取所有历史记录，以便正确合并
 
-      - name: Sync LibreSpark/LibreTV
-        uses: upstream-sync/sync-upstream-action@v1
-        with:
-          upstream_repo: LibreSpark/LibreTV
-          target_branch: main      # 目标分支改为 main
-          github_token: ${{ secrets.GITHUB_TOKEN }}
+      - name: Add upstream repository
+        run: |
+          git remote add upstream https://github.com/LibreSpark/LibreTV.git
+          git fetch upstream
+
+      - name: Merge upstream changes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git merge upstream/main --no-edit
+
+      - name: Push changes to your fork
+        run: git push origin main
